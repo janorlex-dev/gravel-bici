@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#123b3d">
+<title>GRAVEL BICI — Buscador y comparador</title>
+<style>
+:root{--bg:#f3f5f4;--card:#fff;--ink:#172526;--muted:#657575;--line:#dce4e2;--teal:#123b3d;--teal2:#1e6262;--gold:#c5a065;--red:#a33c35;--green:#26704d;--shadow:0 8px 26px rgba(15,45,45,.07)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+header{background:var(--teal);color:#fff;padding:24px max(20px,calc((100vw - 1180px)/2));}
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}.brand{font-size:12px;letter-spacing:.18em;color:#d9c39f;font-weight:800}.title{font-size:clamp(25px,4vw,36px);font-weight:750;margin:4px 0}.sub{color:#d4e0de;max-width:760px;margin:0}
+main{max-width:1180px;margin:22px auto;padding:0 18px 50px}.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+button,.button{border:0;border-radius:9px;padding:10px 14px;font-weight:650;cursor:pointer;background:var(--teal);color:#fff;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:7px}
+button.secondary,.button.secondary{background:#e8efed;color:var(--teal)}button.gold{background:var(--gold);color:#1e2928}button.danger{background:#f8e9e7;color:var(--red)}
+.layout{display:grid;grid-template-columns:310px 1fr;gap:18px;align-items:start}.panel,.card{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow)}
+.panel{padding:18px;position:sticky;top:12px}.panel h2,.sectionhead h2{font-size:17px;margin:0 0 12px}.criteria{display:grid;grid-template-columns:1fr auto;gap:8px 12px;font-size:13px}.criteria span:nth-child(odd){color:var(--muted)}.criteria b{text-align:right}
+.pill{display:inline-block;border-radius:999px;padding:3px 9px;background:#e5f1eb;color:var(--green);font-size:11px;font-weight:750}.pill.gold{background:#f5eee2;color:#7a5a25}.muted{color:var(--muted)}.small{font-size:12px}
+hr{border:0;border-top:1px solid var(--line);margin:16px 0}.section{margin-bottom:18px}.sectionhead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}.count{font-size:12px;color:var(--muted)}
+.searchgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.searchgrid a{background:#f4f7f6;color:var(--teal);border:1px solid var(--line);border-radius:9px;padding:10px;text-decoration:none;font-size:13px;font-weight:650}
+.empty{padding:28px;text-align:center;border:1px dashed #b9c8c5;border-radius:13px;background:#fbfcfc}.empty strong{display:block;font-size:17px;margin-bottom:5px}
+.bikelist{display:grid;gap:10px}.bike{padding:16px}.bikehead{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.bike h3{margin:0;font-size:17px}.price{font-size:22px;font-weight:800;color:var(--teal);white-space:nowrap}.meta{display:flex;gap:7px;flex-wrap:wrap;margin:9px 0}.tag{font-size:12px;padding:4px 8px;border-radius:7px;background:#f0f4f3;color:#405554}.bikefoot{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}.bikefoot a{color:var(--teal2);font-weight:700}
+form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}label{display:grid;gap:5px;font-size:12px;font-weight:700;color:#536564}input,select,textarea{width:100%;padding:10px;border:1px solid #cbd7d4;border-radius:8px;background:#fff;color:var(--ink);font:inherit}input[type=checkbox]{width:auto} .full{grid-column:1/-1}.checks{display:flex;gap:14px;flex-wrap:wrap}.checks label{display:flex;align-items:center;gap:6px;font-weight:600}
+.note{background:#f7f2e9;border-left:3px solid var(--gold);padding:10px 12px;border-radius:7px;font-size:12px;color:#66563c}
+footer{max-width:1180px;margin:0 auto;padding:0 18px 26px;color:var(--muted);font-size:12px}
+@media(max-width:800px){.layout{grid-template-columns:1fr}.panel{position:static}.searchgrid{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){form{grid-template-columns:1fr}.full{grid-column:auto}.bikehead{display:block}.price{margin-top:5px}.searchgrid{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<header>
+ <div class="top"><div><div class="brand">GRAVEL BICI</div><div class="title">Buscador y comparador</div><p class="sub">Una ficha local para definir criterios, localizar anuncios y conservar únicamente bicicletas que cumplen los requisitos.</p></div><span class="pill" style="background:#d9e9e5;color:#123b3d">VERSIÓN 1.0</span></div>
+</header>
+<main>
+ <div class="toolbar">
+  <button id="exportBtn">↓ Exportar copia JSON</button>
+  <button class="secondary" id="importBtn">↑ Importar JSON</button>
+  <input type="file" id="importFile" accept=".json,application/json" hidden>
+  <button class="secondary" id="resetBtn">Restablecer datos</button>
+ </div>
+ <div class="layout">
+  <aside class="panel">
+   <h2>Tu búsqueda activa</h2>
+   <div class="criteria">
+    <span>Presupuesto máximo</span><b>1.300 €</b>
+    <span>Zona</span><b>300 km de Valladolid</b>
+    <span>Estatura</span><b>167 cm</b>
+    <span>Talla orientativa</span><b>XS / S*</b>
+    <span>Transmisión</span><b>2 platos (2x)</b>
+    <span>Frenos</span><b>Hidráulicos</b>
+    <span>Estado</span><b>Nueva y usada</b>
+    <span>Uso</span><b>Carretera + caminos</b>
+    <span>Marcas preferidas</span><b>BH, Orbea, Giant, Trek, Specialized, MMR</b>
+   </div>
+   <hr>
+   <div class="small muted">*La talla se valida con la geometría y las medidas del fabricante, no solo por la letra.</div>
+   <div class="note" style="margin-top:14px">Solo se muestran candidatas que cumplen todos los filtros. Si falta un dato esencial, no se incorpora a la lista válida.</div>
+   <hr>
+   <h2>Buscar anuncios</h2>
+   <div class="searchgrid">
+    <a target="_blank" rel="noopener" href="https://www.google.com/search?q=site%3Amilanuncios.com+bicicleta+gravel+GRX+2x+hidraulicos">Milanuncios</a>
+    <a target="_blank" rel="noopener" href="https://www.google.com/search?q=site%3Awallapop.com+bicicleta+gravel+GRX+2x+hidraulicos">Wallapop</a>
+    <a target="_blank" rel="noopener" href="https://www.google.com/search?q=bicicleta+gravel+2x+frenos+hidraulicos+BH+Orbea+Giant+Trek+Specialized+MMR+oferta">Tiendas online</a>
+    <a target="_blank" rel="noopener" href="https://www.google.com/search?q=gravel+2x+frenos+hidraulicos+segunda+mano+Valladolid+300+km">Otras webs</a>
+   </div>
+   <p class="small muted">Los enlaces abren búsquedas externas. La aplicación no rastrea webs automáticamente ni confirma disponibilidad: cada anuncio debe verificarse antes de guardarlo.</p>
+  </aside>
+  <section>
+   <div class="section">
+    <div class="sectionhead"><h2>Bicicletas que cumplen</h2><span class="count" id="count">0 candidatas</span></div>
+    <div id="bikes" class="bikelist"></div>
+   </div>
+   <div class="card" style="padding:18px">
+    <div class="sectionhead"><h2>Añadir una candidata</h2><span class="pill gold">Validación automática</span></div>
+    <p class="small muted">Introduce los datos del anuncio. Solo se guardará si cumple presupuesto, zona, marca, talla, transmisión y frenos.</p>
+    <form id="bikeForm">
+     <label>Marca<select id="brand" required><option value="">Seleccionar</option><option>BH</option><option>Orbea</option><option>Giant</option><option>Trek</option><option>Specialized</option><option>MMR</option></select></label>
+     <label>Modelo<input id="model" required placeholder="Ej. Terra H30"></label>
+     <label>Precio (€)<input id="price" type="number" min="1" max="1300" required></label>
+     <label>Estado<select id="condition" required><option value="">Seleccionar</option><option>Nueva</option><option>Segunda mano</option></select></label>
+     <label>Localidad<input id="place" required placeholder="Localidad"></label>
+     <label>Distancia desde Valladolid (km)<input id="distance" type="number" min="0" max="300" required></label>
+     <label>Talla / geometría<input id="size" required placeholder="Ej. XS; S; stack/reach verificados"></label>
+     <label>Transmisión<select id="gears" required><option value="">Seleccionar</option><option value="2x">2x — dos platos</option><option value="1x">1x — monoplato</option></select></label>
+     <label>Frenos<select id="brakes" required><option value="">Seleccionar</option><option value="Hidráulicos">Disco hidráulicos</option><option value="Mecánicos">Disco mecánicos</option></select></label>
+     <label>Enlace al anuncio<input id="url" type="url" required placeholder="https://..."></label>
+     <label class="full">Notas de verificación<textarea id="notes" rows="2" placeholder="Año, grupo, factura, estado, garantía, medidas..."></textarea></label>
+     <div class="full"><button type="submit">Comprobar y guardar</button></div>
+    </form>
+    <p id="formMsg" class="small" aria-live="polite"></p>
+   </div>
+  </section>
+ </div>
+</main>
+<footer>GRAVEL BICI · Los datos se guardan en este navegador mediante almacenamiento local. Exporta periódicamente el JSON y súbelo al repositorio Git para conservar copias versionadas.</footer>
+<script>
+const KEY='gravel-bici-v1';
+let bikes=[];
+const $=id=>document.getElementById(id);
+function load(){try{bikes=JSON.parse(localStorage.getItem(KEY)||'[]');if(!Array.isArray(bikes))bikes=[]}catch{bikes=[]}render()}
+function save(){localStorage.setItem(KEY,JSON.stringify(bikes));render()}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function render(){
+ $('count').textContent=`${bikes.length} ${bikes.length===1?'candidata':'candidatas'}`;
+ const root=$('bikes');
+ if(!bikes.length){root.innerHTML='<div class="empty"><strong>No hay candidatas válidas guardadas.</strong><span class="muted small">Cuando encontremos un anuncio que cumpla todos los requisitos, podrás incorporarlo aquí.</span></div>';return}
+ root.innerHTML=bikes.map((b,i)=>`<article class="card bike">
+ <div class="bikehead"><div><h3>${esc(b.brand)} ${esc(b.model)}</h3><div class="meta"><span class="tag">${esc(b.condition)}</span><span class="tag">${esc(b.size)}</span><span class="tag">${esc(b.place)} · ${esc(b.distance)} km</span><span class="tag">${esc(b.gears)}</span><span class="tag">Hidráulicos</span></div></div><div class="price">${Number(b.price).toLocaleString('es-ES')} €</div></div>
+ ${b.notes?`<p class="small muted">${esc(b.notes)}</p>`:''}
+ <div class="bikefoot"><a href="${esc(b.url)}" target="_blank" rel="noopener">Abrir anuncio ↗</a><button class="danger" onclick="removeBike(${i})">Eliminar</button></div>
+ </article>`).join('');
+}
+function removeBike(i){if(confirm('¿Eliminar esta bicicleta?')){bikes.splice(i,1);save()}}
+$('bikeForm').addEventListener('submit',e=>{
+ e.preventDefault();
+ const b={brand:$('brand').value,model:$('model').value.trim(),price:Number($('price').value),condition:$('condition').value,place:$('place').value.trim(),distance:Number($('distance').value),size:$('size').value.trim(),gears:$('gears').value,brakes:$('brakes').value,url:$('url').value.trim(),notes:$('notes').value.trim(),addedAt:new Date().toISOString()};
+ const errors=[];
+ if(!['BH','Orbea','Giant','Trek','Specialized','MMR'].includes(b.brand))errors.push('marca no incluida en las preferidas');
+ if(!(b.price>0&&b.price<=1300))errors.push('supera el presupuesto de 1.300 €');
+ if(!(b.distance>=0&&b.distance<=300))errors.push('supera los 300 km');
+ if(b.gears!=='2x')errors.push('no tiene transmisión de dos platos');
+ if(b.brakes!=='Hidráulicos')errors.push('no tiene frenos hidráulicos');
+ if(!/(xs|s|stack|reach|geometr)/i.test(b.size))errors.push('talla no identificada como XS/S ni geometría indicada');
+ if(errors.length){$('formMsg').textContent='No guardada: '+errors.join('; ')+'.';$('formMsg').style.color='#a33c35';return}
+ if(bikes.some(x=>x.url===b.url)){$('formMsg').textContent='Este enlace ya está guardado.';return}
+ bikes.push(b);save();e.target.reset();$('formMsg').textContent='Candidata guardada. Comprueba igualmente el anuncio, la talla y su disponibilidad.';$('formMsg').style.color='#26704d';
+});
+$('exportBtn').onclick=()=>{
+ const data={app:'GRAVEL BICI',version:1,exportedAt:new Date().toISOString(),criteria:{budget:1300,location:'Valladolid',radiusKm:300,heightCm:167,transmission:'2x',brakes:'Hidráulicos',brands:['BH','Orbea','Giant','Trek','Specialized','MMR'],markets:['Nueva','Segunda mano']},bikes};
+ const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),a=document.createElement('a');
+ a.href=URL.createObjectURL(blob);a.download='gravel-bici-datos.json';a.click();URL.revokeObjectURL(a.href);
+};
+$('importBtn').onclick=()=>$('importFile').click();
+$('importFile').onchange=async e=>{
+ const f=e.target.files[0];if(!f)return;
+ try{const d=JSON.parse(await f.text());const list=Array.isArray(d)?d:d.bikes;if(!Array.isArray(list))throw Error('Formato no válido');
+ bikes=list;save();alert('Datos importados.');}catch(err){alert('No se pudo importar el JSON: '+err.message)}e.target.value='';
+};
+$('resetBtn').onclick=()=>{if(confirm('¿Borrar todas las candidatas guardadas en este navegador? Exporta antes una copia si quieres conservarlas.')){bikes=[];save()}};
+load();
+</script>
+</body></html>
